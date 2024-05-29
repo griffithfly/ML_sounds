@@ -588,4 +588,180 @@ training(myModel, train_dl, val_dl, num_epochs)
 
 <img src="pics/11.png" style="height: 500px; width:1200px;"/>
 
+# Build SVM
+```
+## SVM No Normalize and no MFCC
+class SoundDS(Dataset):
+    def __init__(self, audio_paths, labels, fixed_length=16000):
+        self.audio_paths = audio_paths
+        self.labels = labels
+        self.fixed_length = fixed_length
+
+    def __len__(self):
+        return len(self.audio_paths)
+
+    def __getitem__(self, idx):
+        audio_path = self.audio_paths[idx]
+        waveform, sample_rate = torchaudio.load(audio_path)
+
+        if waveform.shape[1] < self.fixed_length:
+            pad_amount = self.fixed_length - waveform.shape[1]
+            waveform = torch.nn.functional.pad(waveform, (0, pad_amount))
+        else:
+            waveform = waveform[:, :self.fixed_length]
+        features = waveform.flatten().numpy()
+        label = self.labels[idx]
+        
+        return features, label
+
+file_list1 = os.listdir(path1)
+file_list2 = os.listdir(path2)
+c0_list = [os.path.join(path1, f) for f in file_list1 if os.path.splitext(f)[1] == '.wav']
+c1_list = [os.path.join(path2, f) for f in file_list2 if os.path.splitext(f)[1] == '.wav']
+
+audio_files = c0_list + c1_list
+labels = [0] * len(c0_list) + [1] * len(c1_list)
+myds = SoundDS(audio_files, labels)
+
+num_items = len(myds)
+num_train = round(num_items * 0.8)
+num_val = num_items - num_train
+train_ds, val_ds = random_split(myds, [num_train, num_val])
+train_dl = DataLoader(train_ds, batch_size=16, shuffle=True)
+val_dl = DataLoader(val_ds, batch_size=16, shuffle=False)
+
+def prepare_data(dataloader):
+    X = []
+    y = []
+    for features, label in dataloader:
+        X.extend(features.numpy())  # Convert tensor to numpy array and extend
+        y.extend(label.numpy())     # Convert tensor to numpy array and extend
+    return np.array(X), np.array(y)
+
+X_train, y_train = prepare_data(train_dl)
+X_val, y_val = prepare_data(val_dl)
+
+# # Normalize features
+# scaler = StandardScaler()
+# X_train = scaler.fit_transform(X_train)
+# X_val = scaler.transform(X_val)
+
+svm_model = SVC(kernel='linear')
+svm_model.fit(X_train, y_train)
+
+train_accuracy = svm_model.score(X_train, y_train)
+val_accuracy = svm_model.score(X_val, y_val)
+
+print(f'Training Accuracy: {train_accuracy:.4f}')
+print(f'Validation Accuracy: {val_accuracy:.4f}')
+```
+- Training Accuracy: 1.0000
+- Validation Accuracy: 0.8571
+
+# Build KNN
+```
+def prepare_data(dataloader):
+    X = []
+    y = []
+    for features, label in dataloader:
+        X.extend(features.numpy())  # Convert tensor to numpy array and extend
+        y.extend(label.numpy())     # Convert tensor to numpy array and extend
+    return np.array(X), np.array(y)
+
+X_train, y_train = prepare_data(train_dl)
+X_val, y_val = prepare_data(val_dl)
+
+# Normalize features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_val = scaler.transform(X_val)
+
+k_values = range(1, 5)
+train_accuracies = []
+val_accuracies = []
+
+for k in k_values:
+    knn_model = KNeighborsClassifier(n_neighbors=k)
+    knn_model.fit(X_train, y_train)
+    
+    train_predictions = knn_model.predict(X_train)
+    val_predictions = knn_model.predict(X_val)
+    
+    train_accuracy = accuracy_score(y_train, train_predictions)
+    val_accuracy = accuracy_score(y_val, val_predictions)
+    
+    train_accuracies.append(train_accuracy)
+    val_accuracies.append(val_accuracy)
+
+plt.figure(figsize=(12, 6))
+bar_width = 0.4
+index = np.arange(len(k_values))
+
+plt.bar(index, train_accuracies, bar_width, label='Training Accuracy', alpha=0.7)
+plt.bar(index + bar_width, val_accuracies, bar_width, label='Validation Accuracy', alpha=0.7)
+
+plt.xlabel('Number of Neighbors (k)')
+plt.ylabel('Accuracy')
+plt.title('KNN Classifier Accuracy for Different Values of k')
+plt.xticks(index + bar_width / 2, k_values)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Best k
+best_k = k_values[np.argmax(val_accuracies)]
+print(f'Best k: {best_k}')
+print(f'Best Validation Accuracy: {max(val_accuracies):.4f}')
+```
+<img src="pics/12.png" style="height: 495px; width:892px;"/>
+
+- Best k: 1
+- Best Validation Accuracy: 0.9286
+
+# Build Random Forest
+```
+def prepare_data(dataloader):
+    X = []
+    y = []
+    for features, label in dataloader:
+        X.extend(features.numpy())  # Convert tensor to numpy array and extend
+        y.extend(label.numpy())     # Convert tensor to numpy array and extend
+    return np.array(X), np.array(y)
+
+X_train, y_train = prepare_data(train_dl)
+X_val, y_val = prepare_data(val_dl)
+
+# Normalize features
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_val = scaler.transform(X_val)
+
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+train_predictions = rf_model.predict(X_train)
+val_predictions = rf_model.predict(X_val)
+
+train_accuracy = accuracy_score(y_train, train_predictions)
+val_accuracy = accuracy_score(y_val, val_predictions)
+
+print(f'Training Accuracy: {train_accuracy:.4f}')
+print(f'Validation Accuracy: {val_accuracy:.4f}')
+print('\nClassification Report (Validation):\n')
+print(classification_report(y_val, val_predictions))
+
+importances = rf_model.feature_importances_
+indices = np.argsort(importances)[-10:]  # Top 10 features
+
+plt.figure(figsize=(10, 6))
+plt.title('Top 10 Feature Importances')
+plt.barh(range(len(indices)), importances[indices], color='#068AF3', align='center')
+plt.yticks(range(len(indices)), indices)
+plt.xlabel('Relative Importance')
+plt.show()
+```
+
+<img src="pics/13.png" style="height: 495px; width:892px;"/>
+
+
 
