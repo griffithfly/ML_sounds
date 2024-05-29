@@ -155,6 +155,6 @@ for c0 in sorted(c0_list):
 all_waveforms_tensor = torch.stack(all_waveforms)
 plot_waveforms(all_waveforms_tensor, sample_rate, titles=c0_list, xlim=None, ylim=None)
 ```
-<img src="pics/3.png" style="height: 990px; width:1785px;"/>
+<img src="pics/3.png" style="height: 495px; width:892px;"/>
 
 
