@@ -72,7 +72,8 @@ Dtype: torch.float32
 
 tensor([[-0.0329, -0.0375, -0.0166,  ..., -0.2747, -0.2009, -0.2282]])
 
-<img src="" alt="print_size" style="height: 100px; width:100px;"/>
+<img src="pics/1.png" alt="single_wave" style="height: 300px; width:200px;"/>
+<img src="pics/2.png" alt="single_wave" style="height: 300px; width:200px;"/>
 
 ## Visualize raw data
 ### Preparation
@@ -136,5 +137,3 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
 AudioMetaData(sample_rate=16000, num_frames=160000, num_channels=1, bits_per_sample=64, encoding=PCM_F)
 
 
-<img src="pics/1.png" alt="single_wave" style="height: 100px; width:100px;"/>
-<img src="pics/2.png" alt="single_wave" style="height: 100px; width:100px;"/>
