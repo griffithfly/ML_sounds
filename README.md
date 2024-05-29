@@ -564,28 +564,28 @@ def training(model, train_dl, val_dl, num_epochs):
 num_epochs = 10   
 training(myModel, train_dl, val_dl, num_epochs)
 ```
-Epoch: 1, Loss: 2.31, Accuracy: 0.12
-Validation Loss: 2.30, Validation Accuracy: 0.00
-Epoch: 2, Loss: 2.20, Accuracy: 0.39
-Validation Loss: 2.28, Validation Accuracy: 0.00
-Epoch: 3, Loss: 2.05, Accuracy: 0.80
-Validation Loss: 2.19, Validation Accuracy: 0.64
-Epoch: 4, Loss: 1.79, Accuracy: 1.00
-Validation Loss: 2.03, Validation Accuracy: 0.86
-Epoch: 5, Loss: 1.82, Accuracy: 0.95
-Validation Loss: 1.81, Validation Accuracy: 0.93
-Epoch: 6, Loss: 1.54, Accuracy: 0.98
-Validation Loss: 1.62, Validation Accuracy: 0.93
-Epoch: 7, Loss: 1.45, Accuracy: 0.96
-Validation Loss: 1.44, Validation Accuracy: 0.93
-Epoch: 8, Loss: 1.37, Accuracy: 0.98
-Validation Loss: 1.28, Validation Accuracy: 0.93
-Epoch: 9, Loss: 1.30, Accuracy: 0.95
-Validation Loss: 1.19, Validation Accuracy: 1.00
-Epoch: 10, Loss: 1.34, Accuracy: 0.96
-Validation Loss: 1.16, Validation Accuracy: 1.00
-Finished Training
+- Epoch: 1, Loss: 2.31, Accuracy: 0.12
+- Validation Loss: 2.30, Validation Accuracy: 0.00
+- Epoch: 2, Loss: 2.20, Accuracy: 0.39
+- Validation Loss: 2.28, Validation Accuracy: 0.00
+- Epoch: 3, Loss: 2.05, Accuracy: 0.80
+- Validation Loss: 2.19, Validation Accuracy: 0.64
+- Epoch: 4, Loss: 1.79, Accuracy: 1.00
+- Validation Loss: 2.03, Validation Accuracy: 0.86
+- Epoch: 5, Loss: 1.82, Accuracy: 0.95
+- Validation Loss: 1.81, Validation Accuracy: 0.93
+- Epoch: 6, Loss: 1.54, Accuracy: 0.98
+- Validation Loss: 1.62, Validation Accuracy: 0.93
+- Epoch: 7, Loss: 1.45, Accuracy: 0.96
+- Validation Loss: 1.44, Validation Accuracy: 0.93
+- Epoch: 8, Loss: 1.37, Accuracy: 0.98
+- Validation Loss: 1.28, Validation Accuracy: 0.93
+- Epoch: 9, Loss: 1.30, Accuracy: 0.95
+- Validation Loss: 1.19, Validation Accuracy: 1.00
+- Epoch: 10, Loss: 1.34, Accuracy: 0.96
+- Validation Loss: 1.16, Validation Accuracy: 1.00
+- Finished Training
 
-<img src="pics/11.png" style="height: 600px; width:1000px;"/>
+<img src="pics/11.png" style="height: 500px; width:1200px;"/>
 
 
