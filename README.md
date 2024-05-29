@@ -755,7 +755,7 @@ indices = np.argsort(importances)[-10:]  # Top 10 features
 
 plt.figure(figsize=(10, 6))
 plt.title('Top 10 Feature Importances')
-plt.barh(range(len(indices)), importances[indices], color='#068AF3', align='center')
+plt.barh(range(len(indices)), importances[indices], align='center')
 plt.yticks(range(len(indices)), indices)
 plt.xlabel('Relative Importance')
 plt.show()
