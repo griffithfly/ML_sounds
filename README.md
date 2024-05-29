@@ -72,8 +72,8 @@ Dtype: torch.float32
 
 tensor([[-0.0329, -0.0375, -0.0166,  ..., -0.2747, -0.2009, -0.2282]])
 
-<img src="pics/1.png" alt="single_wave" style="height: 300px; width:200px;"/>
-<img src="pics/2.png" alt="single_wave" style="height: 300px; width:200px;"/>
+<img src="pics/1.png" alt="single_wave" style="height: 100px; width:150px;"/>
+<img src="pics/2.png" alt="single_wave" style="height: 100px; width:150px;"/>
 
 ## Visualize raw data
 ### Preparation
