@@ -48,7 +48,8 @@ c1_list = natsorted(c1_list)
 print(len(c0_list), len(c1_list))
 ```
 50 20
-## look a single data
+# Undestanding Data
+## Look a single data
 ```
 metadata = torchaudio.info('class1/0.wav')
 print(metadata)
@@ -72,11 +73,12 @@ Dtype: torch.float32
 
 tensor([[-0.0329, -0.0375, -0.0166,  ..., -0.2747, -0.2009, -0.2282]])
 
-<img src="pics/1.png" alt="single_wave" style="height: 100px; width:150px;"/>
-<img src="pics/2.png" alt="single_wave" style="height: 100px; width:150px;"/>
+<img src="pics/1.png" style="height: 100px; width:150px;"/>
+<img src="pics/2.png" style="height: 100px; width:150px;"/>
 
-## Visualize raw data
+## Visualize all raw data
 ### Preparation
+### Viusal Class0
 ```
 def print_stats(waveform, sample_rate=None, src=None):
   if src:
@@ -94,27 +96,6 @@ def print_stats(waveform, sample_rate=None, src=None):
   print()
   print(waveform)
   print()
-
-def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None):
-  waveform = waveform.numpy()
-
-  num_channels, num_frames = waveform.shape
-  time_axis = torch.arange(0, num_frames) / sample_rate
-
-  figure, axes = plt.subplots(num_channels, 1)
-  if num_channels == 1:
-    axes = [axes]
-  for c in range(num_channels):
-    axes[c].plot(time_axis, waveform[c], linewidth=1)
-    axes[c].grid(True)
-    if num_channels > 1:
-      axes[c].set_ylabel(f'Channel {c+1}')
-    if xlim:
-      axes[c].set_xlim(xlim)
-    if ylim:
-      axes[c].set_ylim(ylim)
-  figure.suptitle(title)
-  plt.show(block=False)
     
 def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
   waveform = waveform.numpy()
@@ -133,7 +114,47 @@ def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
       axes[c].set_xlim(xlim)
   figure.suptitle(title)
   plt.show(block=False)
+
+def plot_waveforms(waveforms, sample_rate, titles=None, xlim=None, ylim=None):
+    num_waveforms, num_channels, num_samples = waveforms.shape
+    time_axis = torch.arange(0, num_samples) / sample_rate
+
+    num_rows = min(num_waveforms, 4)
+    num_cols = min((num_waveforms + num_rows - 1) // num_rows, 5)
+
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(18, 10))
+    axes = axes.ravel() 
+
+    for i in range(num_rows * num_cols):
+        if i < num_waveforms:
+            for c in range(num_channels):
+                ax = axes[i * num_channels + c]  
+                ax.plot(time_axis.numpy(), waveforms[i, c].numpy(), linewidth=1)
+                ax.grid(True)
+                if titles:
+                    ax.set_title(titles[i] + f" - Channel {c+1}")
+                else:
+                    ax.set_title(f"Waveform {i+1} - Channel {c+1}")
+                ax.set_xlabel('Time (s)')
+                ax.set_ylabel('Amplitude')
+
+                if xlim:
+                    ax.set_xlim(xlim)
+                if ylim:
+                    ax.set_ylim(ylim)
+
+    plt.tight_layout()
+    plt.show()
+
+all_waveforms = []
+
+for c0 in sorted(c0_list):
+    waveform, sample_rate = torchaudio.load('class0/' + str(c0))
+    all_waveforms.append(waveform)
+    
+all_waveforms_tensor = torch.stack(all_waveforms)
+plot_waveforms(all_waveforms_tensor, sample_rate, titles=c0_list, xlim=None, ylim=None)
 ```
-AudioMetaData(sample_rate=16000, num_frames=160000, num_channels=1, bits_per_sample=64, encoding=PCM_F)
+<img src="pics/3.png" style="height: 1785px; width:990px;"/>
 
 
