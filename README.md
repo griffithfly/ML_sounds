@@ -27,7 +27,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from torchaudio import transforms
 from IPython.display import Audio
 ```
-## Scan the audio file directory and check file integrity
+## Scan the audio file directory and check data integrity
 ```
 path = '/class0'
 file_list = os.listdir(path)
