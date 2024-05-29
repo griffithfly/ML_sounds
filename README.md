@@ -1,6 +1,7 @@
 # Scan the audio file directory and check file integrity
-*import os*
-*import math, random*
+```
+import os
+import math, random
 import wave
 import numpy as np
 import matplotlib
@@ -25,3 +26,4 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from torchaudio import transforms
 from IPython.display import Audio
+```
