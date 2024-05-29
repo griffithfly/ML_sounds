@@ -1,6 +1,6 @@
 # Scan the audio file directory and check file integrity
-- import os
-- import math, random
+* import os
+* import math, random
 import wave
 import numpy as np
 import matplotlib
