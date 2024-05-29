@@ -156,6 +156,7 @@ all_waveforms_tensor = torch.stack(all_waveforms)
 plot_waveforms(all_waveforms_tensor, sample_rate, titles=c0_list, xlim=None, ylim=None)
 ```
 <img src="pics/3.png" style="height: 495px; width:892px;"/>
+
 ### Viusal Class1
 
 ```
@@ -170,8 +171,9 @@ plot_waveforms(all_waveforms_tensor, sample_rate, titles=c1_list, xlim=None, yli
 ```
 
 <img src="pics/4.png" style="height: 495px; width:892px;"/>
+
 ## Determine to normalize or not
-## Check sample rate to see if we need to Standardize sampling rate
+### Check sample rate to see if we need to Standardize sampling rate
 
 ```
 for c0 in sorted(c0_list):
