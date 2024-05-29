@@ -157,6 +157,7 @@ plot_waveforms(all_waveforms_tensor, sample_rate, titles=c0_list, xlim=None, yli
 ```
 <img src="pics/3.png" style="height: 495px; width:892px;"/>
 ### Viusal Class1
+
 ```
 all_waveforms = []
     
@@ -167,9 +168,11 @@ for c1 in sorted(c1_list):
 all_waveforms_tensor = torch.stack(all_waveforms)
 plot_waveforms(all_waveforms_tensor, sample_rate, titles=c1_list, xlim=None, ylim=None)
 ```
+
 <img src="pics/4.png" style="height: 495px; width:892px;"/>
 ## Determine to normalize or not
 ## Check sample rate to see if we need to Standardize sampling rate
+
 ```
 for c0 in sorted(c0_list):
     waveform, sample_rate = torchaudio.load('class0/' + str(c1))
@@ -179,8 +182,10 @@ for c1 in sorted(c1_list):
     waveform, sample_rate = torchaudio.load('class1/' + str(c1))
     print(c1, sample_rate)
 ```
+
 ## Determine Data Augmentation or not
 ### apply effects to data to see results
+
 ```
 waveform1, sample_rate1 = torchaudio.load('class1/0.wav')
 
@@ -279,6 +284,7 @@ rate = 0.9
 spec_ = strech(spec, rate)
 plot_spectrogram(spec_[0].abs(), title=f"Stretched x{rate}", aspect='equal', xmax=304)
 ```
+
 <img src="pics/7.png" style="height: 100px; width:150px;"/>
 <img src="pics/8.png" style="height: 100px; width:150px;"/>
 <img src="pics/9.png" style="height: 100px; width:150px;"/>
@@ -329,4 +335,5 @@ for idx in range(len(c0_list), num_rows * num_cols):
 plt.tight_layout()
 plt.show()
 ```
+
 <img src="pics/10.png" style="height: 600px; width:1000px;"/>
