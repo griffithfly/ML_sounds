@@ -334,3 +334,258 @@ plt.show()
 ```
 
 <img src="pics/10.png" style="height: 600px; width:1000px;"/>
+
+## Check waveform shape
+```
+path = 'class0'
+file_list = os.listdir(path)
+c0_list = [os.path.join(path, f) for f in file_list if os.path.splitext(f)[1] == '.wav']
+c0_list = natsorted(c0_list)
+
+path = 'class1'
+file_list = os.listdir(path)
+c1_list = [os.path.join(path, f) for f in file_list if os.path.splitext(f)[1] == '.wav']
+c1_list = natsorted(c1_list)
+
+audio_file = c0_list + c1_list
+
+class AudioUtil():
+  def open(audio_file):
+    sig, sr = torchaudio.load(audio_file)
+    return (sig, sr)
+
+for audio_path in audio_file:
+    aud = AudioUtil.open(audio_path)
+    waveform, sample_rate = aud
+    print("Waveform shape:", waveform.shape)
+```
+
+Waveform shape: torch.Size([1, 160000])
+
+# Build CNNs
+```
+class SoundDS(Dataset):
+    def __init__(self, audio_paths):
+        self.audio_paths = audio_paths
+
+    def __len__(self):
+        return len(self.audio_paths)
+
+    def __getitem__(self, idx):
+        audio_path = self.audio_paths[idx]
+        waveform, sample_rate = torchaudio.load(audio_path)
+        # You can add more preprocessing or extract labels if available
+        return waveform, sample_rate
+
+# ----------------------------
+# Audio Classification Model
+# ----------------------------
+class AudioClassifier(nn.Module):
+    def __init__(self):
+        super().__init__()
+        conv_layers = []
+
+        self.conv1 = nn.Conv2d(1, 8, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+        self.relu1 = nn.ReLU()
+        self.bn1 = nn.BatchNorm2d(8)
+        init.kaiming_normal_(self.conv1.weight, a=0.1)
+        self.conv1.bias.data.zero_()
+        conv_layers += [self.conv1, self.relu1, self.bn1]
+
+        self.conv2 = nn.Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        self.relu2 = nn.ReLU()
+        self.bn2 = nn.BatchNorm2d(16)
+        init.kaiming_normal_(self.conv2.weight, a=0.1)
+        self.conv2.bias.data.zero_()
+        conv_layers += [self.conv2, self.relu2, self.bn2]
+
+        self.conv3 = nn.Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        self.relu3 = nn.ReLU()
+        self.bn3 = nn.BatchNorm2d(32)
+        init.kaiming_normal_(self.conv3.weight, a=0.1)
+        self.conv3.bias.data.zero_()
+        conv_layers += [self.conv3, self.relu3, self.bn3]
+
+        self.conv4 = nn.Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+        self.relu4 = nn.ReLU()
+        self.bn4 = nn.BatchNorm2d(64)
+        init.kaiming_normal_(self.conv4.weight, a=0.1)
+        self.conv4.bias.data.zero_()
+        conv_layers += [self.conv4, self.relu4, self.bn4]
+
+        self.ap = nn.AdaptiveAvgPool2d(output_size=1)
+        self.lin = nn.Linear(in_features=64, out_features=10)
+
+        self.conv = nn.Sequential(*conv_layers)
+
+    def forward(self, x):
+        # Ensure the input has the correct shape
+        if x.ndim == 3:  
+            x = x.unsqueeze(1)  
+        x = self.conv(x)
+        x = self.ap(x)
+        x = x.view(x.shape[0], -1)
+        x = self.lin(x)
+        return x
+
+myModel = AudioClassifier()
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+myModel = myModel.to(device)
+
+class SoundDS(Dataset):
+    def __init__(self, audio_paths, labels):
+        self.audio_paths = audio_paths
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.audio_paths)
+
+    def __getitem__(self, idx):
+        audio_path = self.audio_paths[idx]
+        waveform, sample_rate = torchaudio.load(audio_path)
+        label = self.labels[idx]
+        return waveform, label
+
+path1 = '/class0'  
+path2 = '/class1'  
+
+file_list1 = os.listdir(path1)
+file_list2 = os.listdir(path2)
+c0_list = [os.path.join(path1, f) for f in file_list1 if os.path.splitext(f)[1] == '.wav']
+c1_list = [os.path.join(path2, f) for f in file_list2 if os.path.splitext(f)[1] == '.wav']
+audio_file = c0_list + c1_list
+myds = SoundDS(audio_file)
+
+labels1 = [0] * len(os.listdir(path1))  
+labels2 = [1] * len(os.listdir(path2))  
+
+num_items = len(myds)
+num_train = round(num_items * 0.8)
+num_val = num_items - num_train
+train_ds, val_ds = random_split(myds, [num_train, num_val])
+
+train_dl = DataLoader(train_ds, batch_size=16, shuffle=True)
+val_dl = DataLoader(val_ds, batch_size=16, shuffle=False)
+
+def training(model, train_dl, val_dl, num_epochs):
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.001,
+                                                    steps_per_epoch=int(len(train_dl)),
+                                                    epochs=num_epochs,
+                                                    anneal_strategy='linear')
+    
+    train_losses = []
+    val_losses = []
+    train_accs = []
+    val_accs = []
+
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        correct_prediction = 0
+        total_prediction = 0
+
+        for i, data in enumerate(train_dl):
+            inputs, labels = data[0].to(device), data[1].to(device)
+            inputs_m, inputs_s = inputs.mean(), inputs.std()
+            inputs = (inputs - inputs_m) / inputs_s
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+
+            running_loss += loss.item()
+            _, prediction = torch.max(outputs, 1)
+            correct_prediction += (prediction == labels).sum().item()
+            total_prediction += prediction.shape[0]
+
+        num_batches = len(train_dl)
+        avg_loss = running_loss / num_batches
+        acc = correct_prediction / total_prediction
+        print(f'Epoch: {epoch+1}, Loss: {avg_loss:.2f}, Accuracy: {acc:.2f}')
+
+        train_losses.append(avg_loss)
+        train_accs.append(acc)
+
+        model.eval()
+        val_running_loss = 0.0
+        val_correct_prediction = 0
+        val_total_prediction = 0
+        with torch.no_grad():
+            for i, data in enumerate(val_dl):
+                inputs, labels = data[0].to(device), data[1].to(device)
+                inputs_m, inputs_s = inputs.mean(), inputs.std()
+                inputs = (inputs - inputs_m) / inputs_s
+
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+                val_running_loss += loss.item()
+                _, prediction = torch.max(outputs, 1)
+                val_correct_prediction += (prediction == labels).sum().item()
+                val_total_prediction += prediction.shape[0]
+
+        val_num_batches = len(val_dl)
+        val_avg_loss = val_running_loss / val_num_batches
+        val_acc = val_correct_prediction / val_total_prediction
+        print(f'Validation Loss: {val_avg_loss:.2f}, Validation Accuracy: {val_acc:.2f}')
+
+        val_losses.append(val_avg_loss)
+        val_accs.append(val_acc)
+
+    print('Finished Training')
+    
+    # Plotting the loss and accuracy curves
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(range(1, num_epochs + 1), train_losses, label='Training Loss')
+    plt.plot(range(1, num_epochs + 1), val_losses, label='Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.title('Training and Validation Loss')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(1, num_epochs + 1), train_accs, label='Training Accuracy')
+    plt.plot(range(1, num_epochs + 1), val_accs, label='Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.title('Training and Validation Accuracy')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+num_epochs = 10   
+training(myModel, train_dl, val_dl, num_epochs)
+```
+Epoch: 1, Loss: 2.31, Accuracy: 0.12
+Validation Loss: 2.30, Validation Accuracy: 0.00
+Epoch: 2, Loss: 2.20, Accuracy: 0.39
+Validation Loss: 2.28, Validation Accuracy: 0.00
+Epoch: 3, Loss: 2.05, Accuracy: 0.80
+Validation Loss: 2.19, Validation Accuracy: 0.64
+Epoch: 4, Loss: 1.79, Accuracy: 1.00
+Validation Loss: 2.03, Validation Accuracy: 0.86
+Epoch: 5, Loss: 1.82, Accuracy: 0.95
+Validation Loss: 1.81, Validation Accuracy: 0.93
+Epoch: 6, Loss: 1.54, Accuracy: 0.98
+Validation Loss: 1.62, Validation Accuracy: 0.93
+Epoch: 7, Loss: 1.45, Accuracy: 0.96
+Validation Loss: 1.44, Validation Accuracy: 0.93
+Epoch: 8, Loss: 1.37, Accuracy: 0.98
+Validation Loss: 1.28, Validation Accuracy: 0.93
+Epoch: 9, Loss: 1.30, Accuracy: 0.95
+Validation Loss: 1.19, Validation Accuracy: 1.00
+Epoch: 10, Loss: 1.34, Accuracy: 0.96
+Validation Loss: 1.16, Validation Accuracy: 1.00
+Finished Training
+
+<img src="pics/11.png" style="height: 600px; width:1000px;"/>
+
+
