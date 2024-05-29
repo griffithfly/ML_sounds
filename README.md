@@ -208,9 +208,8 @@ print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 <img src="pics/5.png" style="height: 100px; width:150px;"/>
 <img src="pics/6.png" style="height: 100px; width:150px;"/>
 
-----------
-Source: Original
-----------
+
+==Source: Original==
 Sample Rate: 16000
 Shape: (1, 160000)
 Dtype: torch.float32
@@ -221,9 +220,7 @@ Dtype: torch.float32
 
 tensor([[ 0.0749, -0.0468,  0.0461,  ..., -0.2309, -0.2032, -0.2890]])
 
-----------
-Source: Effects Applied
-----------
+==Source: Effects Applied==
 Sample Rate: 16000
 Shape: (2, 200000)
 Dtype: torch.float32
