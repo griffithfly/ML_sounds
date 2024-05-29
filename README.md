@@ -54,6 +54,26 @@ metadata = torchaudio.info('class1/0.wav')
 print(metadata)
 ```
 AudioMetaData(sample_rate=16000, num_frames=160000, num_channels=1, bits_per_sample=64, encoding=PCM_F)
+## Visualize this single data
+```
+waveform, sample_rate = torchaudio.load('/Users/Qiuqi/Desktop/Exports_ASQ/Voice_DATAFILES/class0/0.wav')
+
+print_stats(waveform, sample_rate=sample_rate)
+plot_waveform(waveform, sample_rate)
+plot_specgram(waveform, sample_rate)
+```
+Sample Rate: 16000
+Shape: (1, 160000)
+Dtype: torch.float32
+ - Max:      1.000
+ - Min:     -0.307
+ - Mean:     0.419
+ - Std Dev:  0.275
+
+tensor([[-0.0329, -0.0375, -0.0166,  ..., -0.2747, -0.2009, -0.2282]])
+
+<img src="" alt="print_size" style="height: 100px; width:100px;"/>
+
 ## Visualize raw data
 ### Preparation
 ```
