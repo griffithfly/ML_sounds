@@ -1,4 +1,4 @@
-# Scan the audio file directory and check file integrity
+## Package Dependencies
 ```
 import os
 import math, random
@@ -27,3 +27,24 @@ from sklearn.metrics import accuracy_score, classification_report
 from torchaudio import transforms
 from IPython.display import Audio
 ```
+## Scan the audio file directory and check file integrity
+```
+path = '/class0'
+file_list = os.listdir(path)
+c0_list = []
+for f in file_list:
+    if os.path.splitext(f)[1] == '.wav':
+        c0_list.append(f)
+c0_list = natsorted(c0_list)
+
+path = '/class1'
+file_list = os.listdir(path)
+c1_list = []
+for f in file_list:
+    if os.path.splitext(f)[1] == '.wav':
+        c1_list.append(f)
+c1_list = natsorted(c1_list)
+
+print(len(c0_list), len(c1_list))
+```
+<img src="" alt="print_size" style="height: 100px; width:100px;"/>
