@@ -47,4 +47,73 @@ c1_list = natsorted(c1_list)
 
 print(len(c0_list), len(c1_list))
 ```
+50 20
+## look a single data
+```
+metadata = torchaudio.info('class1/0.wav')
+print(metadata)
+```
+AudioMetaData(sample_rate=16000, num_frames=160000, num_channels=1, bits_per_sample=64, encoding=PCM_F)
+## Visualize raw data
+### Preparation
+```
+def print_stats(waveform, sample_rate=None, src=None):
+  if src:
+    print("-" * 10)
+    print("Source:", src)
+    print("-" * 10)
+  if sample_rate:
+    print("Sample Rate:", sample_rate)
+  print("Shape:", tuple(waveform.shape))
+  print("Dtype:", waveform.dtype)
+  print(f" - Max:     {waveform.max().item():6.3f}")
+  print(f" - Min:     {waveform.min().item():6.3f}")
+  print(f" - Mean:    {waveform.mean().item():6.3f}")
+  print(f" - Std Dev: {waveform.std().item():6.3f}")
+  print()
+  print(waveform)
+  print()
+
+def plot_waveform(waveform, sample_rate, title="Waveform", xlim=None, ylim=None):
+  waveform = waveform.numpy()
+
+  num_channels, num_frames = waveform.shape
+  time_axis = torch.arange(0, num_frames) / sample_rate
+
+  figure, axes = plt.subplots(num_channels, 1)
+  if num_channels == 1:
+    axes = [axes]
+  for c in range(num_channels):
+    axes[c].plot(time_axis, waveform[c], linewidth=1)
+    axes[c].grid(True)
+    if num_channels > 1:
+      axes[c].set_ylabel(f'Channel {c+1}')
+    if xlim:
+      axes[c].set_xlim(xlim)
+    if ylim:
+      axes[c].set_ylim(ylim)
+  figure.suptitle(title)
+  plt.show(block=False)
+    
+def plot_specgram(waveform, sample_rate, title="Spectrogram", xlim=None):
+  waveform = waveform.numpy()
+
+  num_channels, num_frames = waveform.shape
+  time_axis = torch.arange(0, num_frames) / sample_rate
+
+  figure, axes = plt.subplots(num_channels, 1)
+  if num_channels == 1:
+    axes = [axes]
+  for c in range(num_channels):
+    axes[c].specgram(waveform[c], Fs=sample_rate)
+    if num_channels > 1:
+      axes[c].set_ylabel(f'Channel {c+1}')
+    if xlim:
+      axes[c].set_xlim(xlim)
+  figure.suptitle(title)
+  plt.show(block=False)
+```
+AudioMetaData(sample_rate=16000, num_frames=160000, num_channels=1, bits_per_sample=64, encoding=PCM_F)
+
+
 <img src="" alt="print_size" style="height: 100px; width:100px;"/>
