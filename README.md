@@ -199,6 +199,7 @@ plot_waveform(waveform2, sample_rate2, title="Effects Applied", xlim=(-.1, 3.2))
 print_stats(waveform1, sample_rate=sample_rate1, src="Original")
 print_stats(waveform2, sample_rate=sample_rate2, src="Effects Applied")
 ```
+
 <img src="pics/5.png" style="height: 100px; width:150px;"/>
 <img src="pics/6.png" style="height: 100px; width:150px;"/>
 
@@ -230,6 +231,7 @@ tensor([[ 0.0000,  0.0000,  0.0000,  ..., -0.4799, -0.4832, -0.4840],
         [ 0.0000,  0.0000,  0.0000,  ..., -0.4758, -0.4765, -0.4737]])
 
 ## Determine Feature Augmentation or not
+
 ```
 SAMPLE_WAV_SPEECH_PATH = 'class0/0.wav'
 
